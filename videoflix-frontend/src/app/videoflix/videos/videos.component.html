@@ -1,0 +1,116 @@
+@if(videosLoading) {
+<div class="loading-spinner">
+  <mat-spinner></mat-spinner>
+</div>
+} @else { @if (!common.mobileView) {
+<div
+  class="videos"
+  [ngStyle]="getBackgroundStyle()"
+  [@fadeInOut]="animationState"
+>
+  <div class="content-overlay">
+    <h3>{{ title }}</h3>
+    <span>{{ description }}</span>
+    <div class="buttons">
+      <button mat-flat-button (click)="openVideoDialog()">
+        <mat-icon class="material-symbols-outlined">play_arrow</mat-icon> Play
+      </button>
+      <button mat-flat-button [matMenuTriggerFor]="menu">
+        <mat-icon class="material-symbols-outlined">settings</mat-icon> Quality
+      </button>
+      <mat-menu #menu="matMenu">
+        @for (quality of qualities; track quality) {
+        <button
+          mat-menu-item
+          (click)="qualityInfoFlag = true; setQuality(quality.value)"
+          class="quality-selection"
+        >
+          <span>{{ quality.value }}</span>
+          @if(quality.value === currentResolution) {
+          <mat-icon class="material-symbols-outlined">check</mat-icon>
+          }
+        </button>
+        }
+      </mat-menu>
+    </div>
+  </div>
+</div>
+<div class="videos-list">
+  <mat-list>
+    @for (category of getGroupedVideoKeys(); track category) {
+    <div mat-subheader>{{ category }}</div>
+    <div class="vertical">
+      @for (video of groupedVideos[category]; track video) {
+      <div class="thumbnail-wrapper">
+        @if (video.thumbnail_file) {
+        <img
+          [src]="video.thumbnail_file"
+          alt="Video Thumbnail"
+          class="video-thumbnail"
+          (click)="showInfo(video)"
+        />
+        }
+      </div>
+      }
+    </div>
+    }
+  </mat-list>
+</div>
+} @else { @if (mobileListView) {
+<div class="mobile-videos-list">
+  <mat-list>
+    @for (category of getGroupedVideoKeys(); track category) {
+    <div mat-subheader>{{ category }}</div>
+    <div class="vertical">
+      @for (video of groupedVideos[category]; track video) {
+      <div class="thumbnail-wrapper">
+        @if (video.thumbnail_file) {
+        <img
+          [src]="video.thumbnail_file"
+          alt="Video Thumbnail"
+          class="video-thumbnail"
+          (click)="showMobileInfo(video)"
+        />
+        }
+      </div>
+      }
+    </div>
+    }
+  </mat-list>
+</div>
+} @if(!mobileListView) {
+<div
+  class="mobile-mobile-videos"
+  [ngStyle]="getMobileBackgroundStyle()"
+  [@fadeInOut]="animationState"
+></div>
+<div class="mobile-content-overlay">
+  <h3>{{ title }}</h3>
+  <span>{{ description }}</span>
+  <div class="buttons">
+    <button mat-flat-button (click)="openVideoDialog()">
+      <mat-icon class="material-symbols-outlined">play_arrow</mat-icon> Play
+    </button>
+    <button mat-flat-button [matMenuTriggerFor]="menu">
+      <mat-icon class="material-symbols-outlined">settings</mat-icon> Quality
+    </button>
+    <mat-icon (click)="mobileListView=!mobileListView" class="material-symbols-outlined" style="width: 40px !important; font-size: 40px !important; cursor: pointer;"
+      >arrow_back</mat-icon
+    >
+    <mat-menu #menu="matMenu">
+      @for (quality of qualities; track quality) {
+      <button
+        mat-menu-item
+        (click)="qualityInfoFlag = true; setQuality(quality.value)"
+        class="quality-selection"
+      >
+        <span>{{ quality.value }}</span>
+        @if(quality.value === currentResolution) {
+        <mat-icon class="material-symbols-outlined">check</mat-icon>
+        }
+      </button>
+      }
+    </mat-menu>
+  </div>
+</div>
+} } }

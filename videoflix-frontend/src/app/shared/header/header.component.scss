@@ -1,0 +1,54 @@
+:host {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1;
+}
+
+@mixin text-signup($d: flex, $ai: center) {
+  display: $d;
+  align-items: $ai;
+}
+
+.header {
+  padding: 0 32px;
+  @include text-signup();
+  justify-content: space-between;
+  background-color: transparent;
+  height: 108px;
+}
+
+.text-signup {
+  display: flex;
+}
+
+.info-logout{
+  display: flex;
+  gap: 32px;
+}
+
+.buttons {
+  justify-content: flex-start;
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+mat-icon {
+  color: white;
+  width: 32px;
+  height: 32px;
+  font-size: 32px;
+  cursor: pointer;
+}
+
+@media (max-width: 550px) {
+  .header {
+    padding: 0 16px;
+  }
+
+  .info-logout{
+    display: flex;
+    gap: 16px;
+  }
+}

@@ -1,0 +1,47 @@
+<div class="header">
+  @if (common.component == "home" || common.component == "logout" ||
+  common.component == "imprint-privacy") {
+  <div>
+    <img alt="Logo" src="../../../assets/img/Logo.svg" />
+  </div>
+  }@if (common.component == "videos") {
+  <div>
+    <img alt="Logo" src="../../../assets/img/Symbol.svg" />
+  </div>
+  } @if (common.component == "home") {
+  <div class="text-signup">
+    <button mat-flat-button (click)="common.redirectToLogin()">
+      <mat-icon class="material-symbols-outlined">login</mat-icon>Log In</button>
+  </div>
+} @if (common.component == "login") {
+  <div>
+    <img alt="Logo" src="../../../assets/img/Logo.svg" />
+  </div>
+  } @if (common.component == "videos") {
+  <div class="info-logout">
+    @if (!common.loading) {
+      <button mat-flat-button [matMenuTriggerFor]="infoMenu">
+        <mat-icon class="material-symbols-outlined">info</mat-icon> Info
+      </button>
+      <mat-menu #infoMenu="matMenu" xPosition="before">
+        <button mat-menu-item (click)="redirectToLegalNotice()">
+          <mat-icon class="material-symbols-outlined">policy</mat-icon>Imprint / Legal notice
+        </button>
+        <button mat-menu-item (click)="redirectToPrivacy()">
+          <mat-icon class="material-symbols-outlined">lock</mat-icon>Privacy
+        </button>
+      </mat-menu>
+    <button mat-flat-button (click)="logout()">
+      <mat-icon class="material-symbols-outlined">logout</mat-icon> Log Out
+    </button>
+    } @else {
+    <mat-spinner></mat-spinner>
+    }
+  </div>
+  } @if (common.component == "imprint-privacy") {
+  <div class="text-signup">
+    <mat-icon (click)="goBack()" class="material-symbols-outlined"
+      >arrow_back</mat-icon>
+  </div>
+  }
+</div>

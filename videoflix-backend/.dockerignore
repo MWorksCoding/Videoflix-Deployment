@@ -1,0 +1,32 @@
+# Virtualenv (do NOT ship the host's Python env into the image)
+env/
+venv/
+.venv/
+
+# Python caches / build artifacts
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# Local database & coverage
+db.sqlite3
+.coverage
+htmlcov/
+
+# Secrets & local config (injected at runtime instead)
+.env
+*.env
+
+# Uploaded media (served from a mounted volume, not baked into the image)
+media/
+
+# Git & editor
+.git/
+.gitignore
+.vscode/
+.DS_Store
+
+# Docker files themselves
+Dockerfile
+.dockerignore

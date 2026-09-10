@@ -1,0 +1,20 @@
+@import "../login/login.component.scss";
+
+.mat-mdc-card-header {
+  padding: unset;
+}
+
+.registration-headline {
+  color: #2e3edf;
+  font-size: 48px;
+  height: 64px;
+  line-height: 64px;
+  margin-bottom: 86px;
+  text-align: center;
+}
+
+@media (max-width: 650px) {
+  .registration-headline {
+    margin-bottom: 144px;
+  }
+}

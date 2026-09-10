@@ -6,6 +6,9 @@
 /e2e/test-output/
 /.angular/
 .angular/
+/videoflix-backend/media/thumbnails
+/videoflix-backend/media/videos
+/videoflix-backend/info.txt
 
 # Node modules and dependency files
 /node_modules/

@@ -1,0 +1,9 @@
+env/
+.env
+.DS_Store
+db.sqlite3
+media/thumbnails
+media/videos
+info.txt
+.coverage
+htmlcov/

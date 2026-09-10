@@ -1,0 +1,6 @@
+@if(!common.mobileView && common.component !== "videos") {
+<div class="footer" [@fadeInOut]>
+  <a [routerLink]="'/legal-notice'" mat-tab-link>Imprint / Legal notice</a>
+  <a [routerLink]="'/privacy'" mat-tab-link>Privacy</a>
+</div>
+}

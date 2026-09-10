@@ -1,0 +1,44 @@
+<div class="login-card" [@fadeInOut]>
+  <mat-card class="login-card-div">
+    <mat-card-header class="centered-headline">
+      <mat-card-title class="login-headline">Log in</mat-card-title>
+    </mat-card-header>
+    <div class="login-input-fields">
+      <mat-form-field>
+        <mat-label>Email Address</mat-label>
+        <input type="email" matInput [formControl]="emailFormControl" [errorStateMatcher]="matcher"
+               placeholder="">
+        @if (emailFormControl.hasError('email') && !emailFormControl.hasError('required')) {
+          <mat-error>Please enter a valid email address</mat-error>
+        }
+        @if (emailFormControl.hasError('required')) {
+          <mat-error>Email is <strong>required</strong></mat-error>
+        }
+      </mat-form-field>
+    </div>
+    <div class="login-input-fields">
+      <mat-form-field>
+        <mat-label>Password</mat-label>
+        <input matInput type="password" [formControl]="passwordFormControl" placeholder="Please enter your password" required>
+          @if (passwordFormControl.hasError('required')) {
+            <mat-error>A valid Password is <strong>required</strong></mat-error>
+          }
+      </mat-form-field>
+    </div>
+    <div class="button-links">
+      <mat-card-actions>
+        <button mat-raised-button type="submit" class="submit-button" [ngClass]="{'invalid-button': !isFormValid()}" [disabled]="!isFormValid()" (click)="login()">
+          <mat-icon class="material-symbols-outlined">login</mat-icon>Login
+        </button>
+      </mat-card-actions>
+      @if (common.loading) {
+        <mat-spinner></mat-spinner>
+      }
+      <a [routerLink]="'/login-help'" mat-tab-link> Forgot password? </a>
+      <div class="span-link">
+        <span> New to Videoflix?</span>
+        <a [routerLink]="'/register'" mat-tab-link> Sign Up now</a>
+      </div>
+    </div>
+  </mat-card>
+</div>

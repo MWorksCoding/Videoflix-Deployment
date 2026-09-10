@@ -1,0 +1,14 @@
+<div class="login-card" [@fadeInOut]>
+    <mat-card class="login-card-div">
+      <mat-card-header class="centered-headline">
+        <mat-card-title class="error-headline">Something went wrong!</mat-card-title>
+      </mat-card-header>
+      <div class="button-links">
+        <div class="span-link">
+          <span> Please try to log in again</span>
+          <button style="width: 140px;" mat-flat-button (click)="common.redirectToLogin()">
+            <mat-icon class="material-symbols-outlined">login</mat-icon>Log In</button>
+        </div>
+      </div>
+    </mat-card>
+  </div>

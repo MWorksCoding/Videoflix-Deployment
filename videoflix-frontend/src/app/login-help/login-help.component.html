@@ -1,0 +1,33 @@
+<div class="login-card" [@fadeInOut]>
+    <mat-card class="login-card-div">
+      <mat-card-header class="centered-headline">
+        <mat-card-title class="login-headline">Forgot your Password?</mat-card-title>
+      </mat-card-header>
+      <div class="span-link">
+        <span> We will send you an email with instructions to reset your password.</span>
+      </div>
+      <div class="login-input-fields">
+        <mat-form-field>
+            <mat-label>Email Address</mat-label>
+            <input type="email" matInput [formControl]="emailFormControl" [errorStateMatcher]="matcher"
+                   placeholder="">
+            @if (emailFormControl.hasError('email') && !emailFormControl.hasError('required')) {
+              <mat-error>Please enter a valid email address</mat-error>
+            }
+            @if (emailFormControl.hasError('required')) {
+              <mat-error>A valid Email is <strong>required</strong></mat-error>
+            }
+        </mat-form-field>
+      </div>
+      <div class="button-links">
+        <mat-card-actions>
+          <button mat-raised-button type="submit" class="submit-button" [ngClass]="{'invalid-button': emailFormControl.invalid}" [disabled]="emailFormControl.invalid" (click)="resetPassword()">
+            Send Email
+          </button>
+        </mat-card-actions>
+          @if (common.loading) {
+            <mat-spinner></mat-spinner>
+          }
+      </div>
+    </mat-card>
+  </div>

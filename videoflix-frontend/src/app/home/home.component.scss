@@ -1,0 +1,99 @@
+:host {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  background: linear-gradient(
+      180deg,
+      #000000 -19.89%,
+      rgba(0, 0, 0, 0.55) 40.46%,
+      #000000 100%
+    ),
+    url("../../assets/img/bg-home.jpeg");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.home-welcome {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  width: Hug (650px) px;
+  height: Hug (164px) px;
+  gap: 24px;
+}
+
+.headers {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.header-1 {
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 62.5px;
+  text-align: center;
+  color: #ffffff;
+}
+
+.header-2 {
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 31.25px;
+  text-align: center;
+  color: #ffffff;
+}
+
+.header-3 {
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 23.44px;
+  text-align: center;
+  color: #ffffff;
+}
+
+.inputfield-button {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  width: Hug (518px) px;
+  height: Hug (48px) px;
+  gap: 16px;
+}
+
+.input-field {
+  border: 1px white solid !important;
+    border-radius: 32px !important;
+    height: 48px !important;
+}
+
+.submit-button {
+  color: #ffffff !important;
+}
+
+.invalid-button {
+  background-color: #9ba1f0 !important;
+}
+
+
+@media(max-width: 650px) {
+  .header-1 {
+    font-size: 32px;
+  }
+  
+  .header-2 {
+    font-size: 18px;
+  }
+  
+  .header-3 {
+    font-size: 16px;
+  }
+}

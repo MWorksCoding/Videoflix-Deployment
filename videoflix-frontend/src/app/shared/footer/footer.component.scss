@@ -1,0 +1,21 @@
+:host {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  z-index: 1;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 48px;
+  position: sticky;
+  bottom: 0px;
+  height: 60px;
+
+  a {
+    color: #FFFFFF;
+    text-decoration: none;
+  }
+}

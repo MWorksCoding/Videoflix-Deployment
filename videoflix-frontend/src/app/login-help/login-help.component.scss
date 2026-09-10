@@ -1,0 +1,44 @@
+@import '../login/login.component.scss';
+
+:host {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  background: linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0.8) -27.44%,
+      rgba(0, 0, 0, 0.44) 44.23%,
+      rgba(0, 0, 0, 0.8) 100%
+    ),
+    url("../../assets/img/bg-login.jpeg");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.login-headline {
+  color: #2e3edf;
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 48px;
+  text-align: center;
+}
+
+.centered-headline {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 64px;
+  margin-bottom: 48px;
+}
+
+.span-link {
+  text-align: center;
+  display: flex;
+  margin-bottom: 16px;
+}

@@ -1,0 +1,21 @@
+# Dependencies (reinstalled inside the image via npm ci)
+node_modules/
+
+# Build output (generated during the image build)
+dist/
+tmp/
+out-tsc/
+
+# Angular / tooling caches
+.angular/
+.editorconfig
+
+# Git & editor
+.git/
+.gitignore
+.vscode/
+.DS_Store
+
+# Docker files themselves
+Dockerfile
+.dockerignore

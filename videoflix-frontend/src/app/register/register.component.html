@@ -1,0 +1,53 @@
+<div class="login-card" [@fadeInOut]>
+    <mat-card class="login-card-div">
+      <mat-card-header class="centered-headline">
+        <mat-card-title class="login-headline">Sign Up</mat-card-title>
+      </mat-card-header>
+      <div class="login-input-fields">
+        <mat-form-field>
+          <mat-label>Email Address</mat-label>
+          <input type="email" matInput [formControl]="emailFormControl" [errorStateMatcher]="matcher"
+                 placeholder="">
+          @if (emailFormControl.hasError('email') && !emailFormControl.hasError('required')) {
+            <mat-error>Please enter a valid email address</mat-error>
+          }
+          @if (emailFormControl.hasError('required')) {
+            <mat-error>A valid Email is <strong>required</strong></mat-error>
+          }
+        </mat-form-field>
+      </div>
+      <div class="login-input-fields">
+        <mat-form-field>
+          <mat-label>Enter a password</mat-label>
+          <input matInput type="password" [formControl]="passwordFormControl" placeholder="Please enter your password" required>
+          @if (passwordFormControl.hasError('required')) {
+            <mat-error>A valid Password is <strong>required</strong></mat-error>
+          }
+          
+        </mat-form-field>
+      </div>
+      <div class="login-input-fields">
+        <mat-form-field>
+          <mat-label>Confirm password</mat-label>
+          <input matInput type="password" [formControl]="confirmPasswordFormControl" placeholder="Please confirm your password" required>
+          @if (confirmPasswordFormControl.hasError('required')) {
+            <mat-error>Confirming the password is <strong>required</strong></mat-error>
+          }
+          @if (!passwordsMatch() && !confirmPasswordFormControl.hasError('required')) {
+            <mat-error><strong>Passwords must match</strong></mat-error>
+          }
+          <mat-hint>Passwords must match!</mat-hint>
+        </mat-form-field>
+      </div>
+      <div class="button-links">
+        <mat-card-actions>
+          <button mat-raised-button type="submit" class="submit-button" [ngClass]="{'invalid-button': !isFormValid()}" [disabled]="!isFormValid()" (click)="registerUser()">
+            <mat-icon class="material-symbols-outlined">start</mat-icon>Get Started
+          </button>
+        </mat-card-actions>
+        @if (common.loading) {
+        <mat-spinner></mat-spinner>
+      }
+      </div>
+    </mat-card>
+  </div>
