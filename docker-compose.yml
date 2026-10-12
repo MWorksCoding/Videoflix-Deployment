@@ -101,16 +101,16 @@ services:
 
   # The single entry point of the app: nginx serves the Angular build and
   # proxies the API/admin paths to "backend", plus Django static + media files.
-  # Published on host port 8000, bound to 127.0.0.1 so only the host's reverse
-  # proxy (which terminates HTTPS for videoflix.marius-katzer.com) can reach it.
-  # Use "8000:80" instead to expose it directly without a reverse proxy.
+  # Published on host port APP_PORT (default 8000), bound to 127.0.0.1 so only the
+  # host's reverse proxy (which terminates HTTPS for videoflix.marius-katzer.com)
+  # can reach it. Set APP_PORT in .env if 8000 is taken by another project.
   frontend:
     build:
       context: ./videoflix-frontend
       args:
         CONFIGURATION: production
     ports:
-      - "127.0.0.1:8000:80"
+      - "127.0.0.1:${APP_PORT:-8000}:80"
     volumes:
       - static_data:/var/www/static:ro
       - media_data:/var/www/media:ro

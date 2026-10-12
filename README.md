@@ -94,6 +94,8 @@ values into the `backend` and `worker` services.
    `SECRET_KEY`, DB/Redis passwords, SMTP creds and
    `FRONTEND_URL=https://videoflix.marius-katzer.com`.
 4. `docker compose up -d --build` — the app now answers on `127.0.0.1:8000`.
+   If another project already uses port 8000, set e.g. `APP_PORT=8030` in
+   `.env` and use that port in the `proxy_pass` below.
 5. Add a host nginx site, e.g. `/etc/nginx/sites-available/videoflix.marius-katzer.com`:
 
    ```nginx
