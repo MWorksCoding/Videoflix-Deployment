@@ -150,11 +150,11 @@ class RegisterVerified(APIView):
         try:
             response = requests.get(verify_url)
             if response.status_code == 200:
-                return HttpResponseRedirect('http://localhost:4200/register-verified')
+                return HttpResponseRedirect(f'{settings.FRONTEND_URL}/register-verified')
             else:
-                return HttpResponseRedirect('http://localhost:4200/404')
+                return HttpResponseRedirect(f'{settings.FRONTEND_URL}/404')
         except requests.exceptions.RequestException as e:
-            return HttpResponseRedirect('http://localhost:4200/404')
+            return HttpResponseRedirect(f'{settings.FRONTEND_URL}/404')
         
         
 class PasswordResetVerified(APIView):
@@ -182,8 +182,8 @@ class PasswordResetVerified(APIView):
         try:
             response = requests.get(verify_url)
             if response.status_code == 200:
-                return HttpResponseRedirect(f'http://localhost:4200/password-reset?code={verification_code}')
+                return HttpResponseRedirect(f'{settings.FRONTEND_URL}/password-reset?code={verification_code}')
             else:
-                return HttpResponseRedirect('http://localhost:4200/404')
+                return HttpResponseRedirect(f'{settings.FRONTEND_URL}/404')
         except requests.exceptions.RequestException as e:
-            return HttpResponseRedirect('http://localhost:4200/404')
+            return HttpResponseRedirect(f'{settings.FRONTEND_URL}/404')

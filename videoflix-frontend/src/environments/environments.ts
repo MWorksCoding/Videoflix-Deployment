@@ -1,4 +1,6 @@
 export const environment = {
-    production: false,
-    baseUrl: 'https://videoflix-server.marius-katzer.com'
-  };  
+    production: true,
+    // Empty = same origin: nginx in the frontend container proxies the API
+    // paths to the Django backend, so the app works on any domain/port.
+    baseUrl: ''
+  };

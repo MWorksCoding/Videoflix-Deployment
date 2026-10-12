@@ -2,16 +2,23 @@
 
 Runs the whole stack with Docker Compose:
 
-| Service    | What it is                                | URL / Port (host)          |
-|------------|-------------------------------------------|----------------------------|
-| `frontend` | Angular app served by nginx               | http://localhost           |
-| `backend`  | Django REST API (gunicorn)                | http://127.0.0.1:8000      |
-| `worker`   | RQ worker running ffmpeg video conversion | –                          |
-| `db`       | PostgreSQL 16                             | localhost:5433 (inspect)   |
-| `redis`    | Redis 7 (cache + task queue)              | – (internal)               |
+| Service    | What it is                                         | URL / Port (host)          |
+|------------|----------------------------------------------------|----------------------------|
+| `frontend` | nginx: Angular app + proxy to the API, static, media | http://localhost:8000    |
+| `backend`  | Django REST API (gunicorn)                         | – (internal, via nginx)    |
+| `worker`   | RQ worker running ffmpeg video conversion          | –                          |
+| `db`       | PostgreSQL 16                                      | 127.0.0.1:5433 (inspect)   |
+| `redis`    | Redis 7 (cache + task queue)                       | – (internal)               |
 
-Frontend and backend run as **separate origins** (the browser calls the API
-directly), matching the production setup with two subdomains.
+Everything is served from **one origin on port 8000**. nginx in the `frontend`
+container serves the Angular build and forwards these paths to Django:
+`/admin/`, `/api/`, `/django-rq/`, `/login/`, `/logout/`, `/videos/`,
+`/register-verified/`, `/password-reset-verified/`. It serves `/static/`
+(collectstatic output) and `/media/` (uploaded videos) straight from the
+shared volumes, so this also works with `DEBUG=False`.
+
+Port 8000 is bound to `127.0.0.1` only. On the server, a reverse proxy on the
+host (nginx + certbot) terminates HTTPS and forwards to it.
 
 ## Run it locally
 
@@ -23,11 +30,11 @@ docker compose up --build
 First build takes a few minutes (installs ffmpeg, builds the Angular app).
 When it's up:
 
-- Frontend: <http://localhost>
-- Backend API / admin: <http://127.0.0.1:8000/admin/>
-- RQ dashboard: <http://127.0.0.1:8000/django-rq/>
+- App: <http://localhost:8000>
+- Django admin: <http://localhost:8000/admin/>
+- RQ dashboard: <http://localhost:8000/django-rq/>
 
-Database migrations run automatically on backend startup.
+Database migrations and `collectstatic` run automatically on backend startup.
 
 ### Create an admin user
 
@@ -35,7 +42,7 @@ Database migrations run automatically on backend startup.
 docker compose exec backend python manage.py createsuperuser
 ```
 
-Then log into <http://127.0.0.1:8000/admin/> and upload a video. The `worker`
+Then log into <http://localhost:8000/admin/> and upload a video. The `worker`
 service picks it up and generates the 120p/360p/720p/1080p versions +
 thumbnail. Watch it happen with:
 
@@ -75,31 +82,42 @@ docker compose up --build
 `docker compose` reads `.env` from this directory automatically and injects the
 values into the `backend` and `worker` services.
 
-## Deploying to your server
+> Wrap any value that contains a `$` in single quotes (`SECRET_KEY='ab$cd'`).
+> Unquoted, compose reads `$cd` as a variable, warns
+> `The "cd" variable is not set` and silently truncates the value.
 
-1. Copy this folder (with both repos) to the server, install Docker + the
-   Compose plugin.
-2. Create a real `.env` (see `.env.example`) with `DEBUG=False`, a strong
-   `SECRET_KEY`, DB/Redis passwords, SMTP creds, and your domain in
-   `DJANGO_ALLOWED_HOSTS` / `CORS_ALLOWED_ORIGINS`.
-3. Build the frontend for production so it targets your API subdomain instead
-   of `127.0.0.1:8000`. In `docker-compose.yml`, set the frontend build arg:
+## Deploying to your server (videoflix.marius-katzer.com)
 
-   ```yaml
-   frontend:
-     build:
-       context: ./videoflix-frontend
-       args:
-         CONFIGURATION: production   # uses src/environments/environments.ts
+1. Point the DNS `A` record of `videoflix.marius-katzer.com` at the server.
+2. Clone this repo on the server, install Docker + the Compose plugin.
+3. Create a real `.env` (see `.env.example`) with `DEBUG=False`, a strong
+   `SECRET_KEY`, DB/Redis passwords, SMTP creds and
+   `FRONTEND_URL=https://videoflix.marius-katzer.com`.
+4. `docker compose up -d --build` — the app now answers on `127.0.0.1:8000`.
+5. Add a host nginx site, e.g. `/etc/nginx/sites-available/videoflix.marius-katzer.com`:
+
+   ```nginx
+   server {
+       listen 80;
+       server_name videoflix.marius-katzer.com;
+
+       client_max_body_size 2G;   # video uploads through the admin
+
+       location / {
+           proxy_pass http://127.0.0.1:8000;
+           proxy_set_header Host $host;
+           proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+           proxy_set_header X-Forwarded-Proto $scheme;
+           proxy_read_timeout 300s;
+       }
+   }
    ```
 
-4. `docker compose up --build -d`
+   ```bash
+   sudo ln -s /etc/nginx/sites-available/videoflix.marius-katzer.com /etc/nginx/sites-enabled/
+   sudo nginx -t && sudo systemctl reload nginx
+   sudo certbot --nginx -d videoflix.marius-katzer.com   # adds HTTPS
+   ```
 
-### Production notes (not needed for local testing)
-
-- With `DEBUG=False`, Django no longer serves `/static/` and `/media/`. Put a
-  reverse proxy (nginx / Traefik) in front to serve those and terminate TLS,
-  or add WhiteNoise for static files. The media volume is already shared
-  between `backend` and `worker`.
-- Point your two subdomains at the server and proxy them to the `frontend`
-  (`:80`) and `backend` (`:8000`) services.
+The `X-Forwarded-Proto` header matters: Django uses it to build `https://`
+media URLs (otherwise the browser blocks the videos as mixed content).

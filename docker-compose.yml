@@ -11,6 +11,8 @@ x-backend-env: &backend-env
   SECRET_KEY: "${SECRET_KEY:-django-insecure-local-dev-key-change-me}"
   DJANGO_ALLOWED_HOSTS: "${DJANGO_ALLOWED_HOSTS:-}"
   CORS_ALLOWED_ORIGINS: "${CORS_ALLOWED_ORIGINS:-}"
+  # Public URL of the app; the email verification views redirect here.
+  FRONTEND_URL: "${FRONTEND_URL:-http://localhost:8000}"
   # --- Database (talks to the "db" service over the compose network) ---
   DATABASE_NAME: "${DATABASE_NAME:-database_videoflix}"
   DATABASE_USER: "${DATABASE_USER:-videoflix_user}"
@@ -47,8 +49,9 @@ services:
       - postgres_data:/var/lib/postgresql/data
     ports:
       # Host 5433 -> container 5432 (5433 avoids clashing with a local/brew Postgres).
-      # Only needed if you want to inspect the DB from the host; remove if not.
-      - "5433:5432"
+      # Bound to 127.0.0.1 so the DB is never reachable from the internet
+      # (Docker-published ports bypass ufw). Only needed to inspect the DB from the host.
+      - "127.0.0.1:5433:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER:-videoflix_user} -d ${DATABASE_NAME:-database_videoflix}"]
       interval: 5s
@@ -65,16 +68,16 @@ services:
       timeout: 5s
       retries: 10
 
-  # Django API (gunicorn). Runs DB migrations on startup, then serves on :8000.
+  # Django API (gunicorn). Runs DB migrations + collectstatic on startup, then
+  # serves on :8000 inside the compose network only (nginx in "frontend" proxies to it).
   backend:
     build: ./videoflix-backend
-    command: ["sh", "-c", "python manage.py migrate --noinput && gunicorn videoflix_backend.wsgi:application --bind 0.0.0.0:8000 --workers 3 --timeout 120"]
+    command: ["sh", "-c", "python manage.py migrate --noinput && python manage.py collectstatic --noinput && gunicorn videoflix_backend.wsgi:application --bind 0.0.0.0:8000 --workers 3 --timeout 120"]
     environment:
       <<: *backend-env
     volumes:
       - media_data:/usr/src/app/media
-    ports:
-      - "8000:8000"
+      - static_data:/usr/src/app/static
     depends_on:
       db:
         condition: service_healthy
@@ -96,19 +99,25 @@ services:
       redis:
         condition: service_healthy
 
-  # Angular app built to static files and served by nginx on :80.
-  # CONFIGURATION=development -> baseUrl points at http://127.0.0.1:8000 (local).
-  # For your server, build with CONFIGURATION=production (see README).
+  # The single entry point of the app: nginx serves the Angular build and
+  # proxies the API/admin paths to "backend", plus Django static + media files.
+  # Published on host port 8000, bound to 127.0.0.1 so only the host's reverse
+  # proxy (which terminates HTTPS for videoflix.marius-katzer.com) can reach it.
+  # Use "8000:80" instead to expose it directly without a reverse proxy.
   frontend:
     build:
       context: ./videoflix-frontend
       args:
-        CONFIGURATION: development
+        CONFIGURATION: production
     ports:
-      - "80:80"
+      - "127.0.0.1:8000:80"
+    volumes:
+      - static_data:/var/www/static:ro
+      - media_data:/var/www/media:ro
     depends_on:
       - backend
 
 volumes:
   postgres_data:
   media_data:
+  static_data:

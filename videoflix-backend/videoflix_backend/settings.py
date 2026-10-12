@@ -66,6 +66,13 @@ if _extra_cors:
 # Trust the same origins for CSRF (required for session-authenticated POSTs from the SPA)
 CSRF_TRUSTED_ORIGINS = list(CORS_ALLOWED_ORIGINS)
 
+# Behind nginx (and the server's HTTPS reverse proxy): trust X-Forwarded-Proto so
+# request.is_secure() and absolute media URLs use https instead of http.
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# Public URL of the Angular app; the email verification views redirect here.
+FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:4200').rstrip('/')
+
 
 CORS_ALLOW_CREDENTIALS = True
 
