@@ -22,6 +22,15 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
+def env_list(name, default=''):
+    '''
+    Read a comma-separated environment variable as a list,
+    e.g. "a.com, b.com" -> ['a.com', 'b.com']. Unset or empty -> default.
+    '''
+    value = os.getenv(name) or default
+    return [item.strip() for item in value.split(',') if item.strip()]
+
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
@@ -31,47 +40,27 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-local-dev-key-change-me')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'False').lower() in ('true', '1', 'yes', 'on')
 
-ALLOWED_HOSTS = [
-    'localhost',
-    '127.0.0.1',
-    '0.0.0.0',
-    'backend',
-    '35.246.244.60:80',
-    '35.246.224.60:443',
-    '35.246.224.60',
-    'videoflix-server.marius-katzer.com',
-    'videoflix.marius-katzer.com',
-]
+# Public URL of the Angular app; the email verification views redirect here.
+FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:4200').rstrip('/')
 
-# Additional hosts can be added via env (comma-separated), e.g. "example.com,1.2.3.4"
-_extra_hosts = os.getenv('DJANGO_ALLOWED_HOSTS', '')
-if _extra_hosts:
-    ALLOWED_HOSTS += [h.strip() for h in _extra_hosts.split(',') if h.strip()]
+# Hostnames (no scheme, no port) this Django may serve, e.g. "videoflix.marius-katzer.com"
+ALLOWED_HOSTS = env_list('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1')
 
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost',
-    'http://localhost:80',
-    'http://localhost:4200',
-    'http://127.0.0.1',
-    'http://127.0.0.1:8000',
-    'https://videoflix.marius-katzer.com',
-    'https://videoflix-server.marius-katzer.com',
-]
+# Always allowed: the email verification views call this API internally via
+# http://127.0.0.1:8000 (see videoflix/views.py).
+if '127.0.0.1' not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append('127.0.0.1')
 
-# Additional CORS origins can be added via env (comma-separated, include the scheme)
-_extra_cors = os.getenv('CORS_ALLOWED_ORIGINS', '')
-if _extra_cors:
-    CORS_ALLOWED_ORIGINS += [o.strip() for o in _extra_cors.split(',') if o.strip()]
+# Origins (with scheme) allowed to call the API from another origin. Defaults to
+# the frontend URL, e.g. "ng serve" on http://localhost:4200 during development.
+CORS_ALLOWED_ORIGINS = env_list('CORS_ALLOWED_ORIGINS', FRONTEND_URL)
 
-# Trust the same origins for CSRF (required for session-authenticated POSTs from the SPA)
-CSRF_TRUSTED_ORIGINS = list(CORS_ALLOWED_ORIGINS)
+# Trust the same origins for CSRF, plus the app's own public URL (Django admin login)
+CSRF_TRUSTED_ORIGINS = list(dict.fromkeys(CORS_ALLOWED_ORIGINS + [FRONTEND_URL]))
 
 # Behind nginx (and the server's HTTPS reverse proxy): trust X-Forwarded-Proto so
 # request.is_secure() and absolute media URLs use https instead of http.
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-
-# Public URL of the Angular app; the email verification views redirect here.
-FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:4200').rstrip('/')
 
 
 CORS_ALLOW_CREDENTIALS = True
